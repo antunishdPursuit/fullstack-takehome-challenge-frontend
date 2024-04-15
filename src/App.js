@@ -1,23 +1,40 @@
-import logo from './logo.svg';
-import './App.css';
+// DEPENDENCIES
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+
+// PAGES
+import Home from "./pages/Home"
+import Register from "./pages/Register"
+import ParticipantsPage from "./pages/ParticipantsPage"
+import WinnerPage from "./pages/WinnerPage"
+import { useEffect, useState } from "react";
+import axios from "axios";
+const API = process.env.REACT_APP_API_URL;
 
 function App() {
+  const [raffles, setRaffles] = useState([])
+  // const [raffle, setRaffle] = useState({})
+  const [raffleId, setRaffleId] = useState(1)
+  useEffect(() => {
+    axios
+      .get(`${API}/api/raffles`)
+      .then((res) => {
+        setRaffles(res.data.data)
+      })
+      .catch((err) => {
+        console.error("catch", err)
+      })
+  }, [])
+  
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Home raffles={raffles}/>}/>
+          <Route path="/raffles/:id" element={<Register setRaffleId={setRaffleId} raffleId={raffleId}/>}/>
+          <Route path="/raffles/:id/participants" element={<ParticipantsPage setRaffleId={setRaffleId} raffleId={raffleId}/>}/>
+          <Route path="/raffles/:id/winner" element={<WinnerPage setRaffleId={setRaffleId} raffleId={raffleId}/>}/>
+        </Routes>
+      </Router>
     </div>
   );
 }
